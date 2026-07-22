@@ -1,0 +1,13 @@
+{
+  "name": "lightmetrics-pipeline-tests",
+  "private": true,
+  "scripts": {
+    "test:pipeline": "playwright test Tests/specs/pipeline.spec.ts --headed --reporter=list"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.0.0",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.7.2"
+  }
+}
