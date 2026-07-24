@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import * as fs from 'fs';
+import * as path from 'path';
 import { LoginPage } from '../pages/login.page';
 import { PipelinePage } from '../pages/pipeline.page';
 
@@ -40,5 +42,10 @@ test('configure a pipeline and save it as a new template', async ({ page }) => {
   await pipelinePage.selectFirstVideoDataCheckbox();
 
   console.log('Step 8: saving as a new template');
-  await pipelinePage.saveAsTemplate();
+  const templateName = await pipelinePage.saveAsTemplate();
+
+  const templateRecordPath = path.join(process.cwd(), 'Tests', 'data', 'lastTemplate.json');
+  fs.mkdirSync(path.dirname(templateRecordPath), { recursive: true });
+  fs.writeFileSync(templateRecordPath, JSON.stringify({ templateName }), 'utf-8');
+  console.log(`Saved template name for reuse: ${templateName}`);
 });

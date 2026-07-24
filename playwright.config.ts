@@ -20,7 +20,7 @@ export default defineConfig({
   testDir: './Tests',
   timeout: 120_000,
   expect: {
-    timeout: 15_000,
+    timeout: 15000,
   },
   fullyParallel: false,
   reporter: 'list',

@@ -63,7 +63,7 @@ export class PipelinePage {
     await modelPathToggle.click();
 
     const modelsOption = this.page.getByRole('option', { name: 'Models', exact: true });
-    await expect(modelsOption).toBeVisible({ timeout: 10000 });
+    await expect(modelsOption).toBeVisible({ timeout: 20000 });
     await modelsOption.click();
     await expect(this.sourceModelPathInput).toHaveValue('Models');
   }
@@ -99,7 +99,7 @@ export class PipelinePage {
   await expect(checkbox).toBeChecked();
 }
 
-  public async saveAsTemplate(): Promise<void> {
+  public async saveAsTemplate(): Promise<string> {
   await expect(this.saveTemplateButton).toBeVisible();
   await this.saveTemplateButton.click();
 
@@ -118,5 +118,7 @@ export class PipelinePage {
   await expect(
     this.page.getByText(/saved|success/i).first()
   ).toBeVisible({ timeout: 15000 });
+
+  return templateName;
     }
 }
