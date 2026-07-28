@@ -44,26 +44,34 @@ export class PipelinePage {
     await expect(this.descriptionInput).toBeVisible();
     await this.descriptionInput.fill('Automated pipeline run created for validation purposes only.');
 
-    // Select Source Reference is plain text entry — type it and confirm with Tab to trigger validation
     await expect(this.sourceReferenceInput).toBeVisible();
     await this.sourceReferenceInput.click();
     await this.sourceReferenceInput.pressSequentially('main', { delay: 100 });
-    await this.sourceReferenceInput.press('Tab'); // triggers blur, which likely runs branch validation
+    await this.sourceReferenceInput.press('Tab');
     await expect(this.sourceReferenceInput).toHaveValue('main');
 
-    // Source Model Path only enables once "main" passes validation — this can take a moment
     await expect(this.sourceModelPathInput).toBeEnabled({ timeout: 15000 });
-    await this.page.waitForTimeout(300); // small settle time after enable transition
+    await this.page.waitForTimeout(300);
 
-    // Click the dropdown toggle button scoped to this specific Autocomplete, not the raw input
     const modelPathContainer = this.sourceModelPathInput.locator(
       'xpath=ancestor::div[contains(@class, "MuiAutocomplete-root")]'
     );
     const modelPathToggle = modelPathContainer.getByRole('button', { name: 'Open' });
-    await modelPathToggle.click();
-
     const modelsOption = this.page.getByRole('option', { name: 'Models', exact: true });
-    await expect(modelsOption).toBeVisible({ timeout: 20000 });
+
+    // Cold starts (first run after a gap) can make the options-fetch API slow —
+    // wait for that response explicitly instead of guessing a fixed timeout.
+    const optionsResponsePromise = this.page
+      .waitForResponse(
+        (res) => /model.*path|models/i.test(res.url()) && res.request().method() === 'GET',
+        { timeout: 45000 }
+      )
+      .catch(() => null);
+
+    await modelPathToggle.click();
+    await optionsResponsePromise;
+
+    await expect(modelsOption).toBeVisible({ timeout: 3000 });
     await modelsOption.click();
     await expect(this.sourceModelPathInput).toHaveValue('Models');
   }
