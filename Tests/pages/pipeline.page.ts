@@ -58,6 +58,7 @@ export class PipelinePage {
     );
     const modelPathToggle = modelPathContainer.getByRole('button', { name: 'Open' });
     const modelsOption = this.page.getByRole('option', { name: 'Models', exact: true });
+    await expect(modelPathToggle).toBeVisible({ timeout: 3000 });
 
     // Cold starts (first run after a gap) can make the options-fetch API slow —
     // wait for that response explicitly instead of guessing a fixed timeout.
