@@ -54,26 +54,43 @@ export class PipelinePage {
     await this.page.waitForTimeout(300);
 
     const modelPathContainer = this.sourceModelPathInput.locator(
-      'xpath=ancestor::div[contains(@class, "MuiAutocomplete-root")]'
+      'xpath=ancestor::div[contains(@class,"MuiAutocomplete-root")]'
     );
-    const modelPathToggle = modelPathContainer.getByRole('button', { name: 'Open' });
-    const modelsOption = this.page.getByRole('option', { name: 'Models', exact: true });
-    await expect(modelPathToggle).toBeVisible({ timeout: 3000 });
 
-    // Cold starts (first run after a gap) can make the options-fetch API slow —
-    // wait for that response explicitly instead of guessing a fixed timeout.
-    const optionsResponsePromise = this.page
-      .waitForResponse(
-        (res) => /model.*path|models/i.test(res.url()) && res.request().method() === 'GET',
-        { timeout: 45000 }
-      )
-      .catch(() => null);
+    // Find the dropdown toggle button
+    const modelPathToggle = modelPathContainer.getByRole('button').first();
 
+    await expect(modelPathToggle).toBeVisible({ timeout: 15000 });
+
+    // Open the dropdown
     await modelPathToggle.click();
-    await optionsResponsePromise;
 
-    await expect(modelsOption).toBeVisible({ timeout: 3000 });
+    // Debug screenshot (optional but useful)
+    await this.page.screenshot({
+      path: 'models-dropdown.png',
+      fullPage: true,
+    });
+
+    // Wait for the dropdown list to appear
+    const listBox = this.page.locator('[role="listbox"]');
+
+    await expect(listBox).toBeVisible({
+      timeout: 15000,
+    });
+
+    // Find the "Models" option
+    const modelsOption = listBox.getByText('Models', {
+      exact: true,
+    });
+
+    await expect(modelsOption).toBeVisible({
+      timeout: 15000,
+    });
+
+    // Click the option
     await modelsOption.click();
+
+    // Verify the selected value
     await expect(this.sourceModelPathInput).toHaveValue('Models');
   }
 
