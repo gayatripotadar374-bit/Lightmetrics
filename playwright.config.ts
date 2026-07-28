@@ -19,14 +19,21 @@ for (const key of requiredEnvironmentKeys) {
 export default defineConfig({
   testDir: './Tests',
   timeout: 120_000,
+
   expect: {
     timeout: 15000,
   },
+
   fullyParallel: false,
+
   reporter: 'list',
+
   use: {
     baseURL: process.env.BASE_URL,
-    headless: false,
+
+    // Local = headed, GitHub Actions = headless
+    headless: !!process.env.CI,
+
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
